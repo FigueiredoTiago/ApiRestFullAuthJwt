@@ -9,6 +9,8 @@ const app = express();
 //middlewares
 const authMiddleware = require('./middlewares/auth.middleware');
 
+//services
+
 // configuração do express para receber json
 app.use(express.json());
 
@@ -16,7 +18,7 @@ app.use(express.json());
 const User = require('./model/User');
 const History = require('./model/History');
 
-//rota aberta - 
+//rota aberta - que pega todas as historias
 app.get('/allhistory', async (req, res) => {
     try {
         const history = await History.find();
@@ -66,6 +68,56 @@ app.post('/newhistory', authMiddleware, checkToken, async (req, res) => {
 
 });
 
+//rota para pegar as historias do usuario logado
+app.get('/myhistory', authMiddleware, checkToken, async (req, res) => {
+    try {
+        const id = req.userId;
+        const history = await History.find({ authorid: id }).sort({ _id: -1 }).populate('authorid');
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ error: error })
+    }
+});
+
+//rota para atualizar as historias do usuario logado
+
+app.patch('/updatehistory/:id', authMiddleware, checkToken, async (req, res) => {
+    //pegando o id da historia
+    const id = req.params.id;
+    //pegando o id do usuario logado
+    const authorid = req.userId;
+    //pegando os dados do body
+    const { name, stack, history, github } = req.body;
+    //validando os campos
+    if (!name || !stack || !history || !github) {
+        res.status(422).json({ error: "Prencha Todos os Campos vazios!" });
+        return;
+    }
+    //atualizando os dados no banco
+    const historyUpdate = History.findOneAndUpdate({ _id: id }, {
+        name: name,
+        stack: stack,
+        history: history,
+        github: github,
+    }, { rawResult: true });
+    //verificando se o usuario logado é o mesmo que criou a historia
+    try {
+        const history = await History.findById({ _id: id });
+
+        if (history.authorid != authorid) {
+            res.status(401).json({ error: "Acesso Negado voce nao e o Dono dessa historia! " });
+            return;
+        }
+
+        await historyUpdate;
+        return res.status(200).json({ message: 'Historia Atualizada com sucesso!' });
+
+    } catch (error) {
+        res.status(500).json({ error: error })
+    }
+
+});
+
 //funcao para verificar se o token é valido
 function checkToken(req, res, next) {
     const authHeader = req.get('authorization');
@@ -85,7 +137,6 @@ function checkToken(req, res, next) {
     }
 
 }
-
 
 //Rota de Registrar Usuario:
 app.post('/auth/register', async (req, res) => {
