@@ -89,7 +89,7 @@ app.patch('/updatehistory/:id', authMiddleware, checkToken, async (req, res) => 
     //pegando os dados do body
     const { name, stack, history, github } = req.body;
     //validando os campos
-    if (!name || !stack || !history || !github) {
+    if (!name && !stack && !history && !github) {
         res.status(422).json({ error: "Prencha Todos os Campos vazios!" });
         return;
     }
