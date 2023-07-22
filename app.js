@@ -28,9 +28,10 @@ app.use('/history', historyRoute);
 //Conctando ao BD
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
+const port = process.env.URL_SERVER || 3001;
 
 mongoose.connect(`mongodb+srv://${dbUser}:${dbPassword}@clusterjwt.lr08afb.mongodb.net/?retryWrites=true&w=majority`).then(() => {
-    app.listen(3001);
+    app.listen(port);
     console.log('Api rodando na porta 3001, Conectado ao BD com Sucesso!');
 }).catch((err) => { console.log(err) });
 
