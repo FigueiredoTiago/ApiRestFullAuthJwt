@@ -57,13 +57,13 @@ router.post('/auth/login', async (req, res) => {
     //verificando se o Usuario  já esta cadastrado
     const user = await User.findOne({ email: email });
     if (!user) {
-        return res.status(404).json({ data: { message: 'Usuario nao cadastrado' } });
+        return res.status(404).json({ message: 'Usuario nao cadastrado' });
     }
 
     //verificando se a senha esta correta
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
-        return res.status(422).json({ data: { message: 'Senha incorreta!' } });
+        return res.status(422).json({ message: 'Senha incorreta! Tente novamente.' });
     }
     //criando o token
     try {
