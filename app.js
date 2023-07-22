@@ -1,22 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 const app = express();
 
-//middlewares
-const authMiddleware = require('./middlewares/auth.middleware');
-
-//services
-
 // configuração do express para receber json
 app.use(express.json());
-
-//Models
-const User = require('./model/User');
-const History = require('./model/History');
 
 //rotas
 const userRoute = require('./routes/user');
@@ -24,7 +13,6 @@ const historyRoute = require('./routes/history');
 
 app.use('/user', userRoute);
 app.use('/history', historyRoute);
-
 
 //rota privada que precisa do token para pesquisar um usuario
 // app.get('/user/:id', checkToken, async (req, res) => {
@@ -38,7 +26,6 @@ app.use('/history', historyRoute);
 // });
 
 //Conctando ao BD
-
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
 
