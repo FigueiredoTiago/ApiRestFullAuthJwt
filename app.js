@@ -1,8 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
+
 
 const app = express();
+app.use(cors());
 
 // configuração do express para receber json
 app.use(express.json());
