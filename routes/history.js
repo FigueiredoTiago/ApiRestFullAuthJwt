@@ -16,7 +16,6 @@ router.get('/allhistory', async (req, res) => {
     }
 });
 
-
 //Rota Privada para postar hitorias
 router.post('/newhistory', authMiddleware, async (req, res) => {
     const { name, stack, history, github } = req.body;
@@ -94,4 +93,26 @@ router.patch('/updatehistory/:id', authMiddleware, async (req, res) => {
 
 });
 
+//rota para deletar a historia do usuario logado
+
+router.delete('/deletehistory/:id', authMiddleware, async (req, res) => {
+    const id = req.params.id;
+    const authorid = req.userId;
+
+    try {
+        const history = await History.findById({ _id: id });
+
+        if (history.authorid != authorid) {
+            res.status(401).json({ error: "Acesso Negado, você não pode apagar essa historia! " });
+            return;
+        }
+
+        await History.deleteOne({ _id: id });
+        return res.status(200).json({ message: 'Historia Deletada com sucesso!' });
+
+    } catch (error) {
+        res.status(500).json({ error: error })
+    }
+
+});
 module.exports = router;
