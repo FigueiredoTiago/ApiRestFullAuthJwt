@@ -116,3 +116,19 @@ router.delete('/deletehistory/:id', authMiddleware, async (req, res) => {
 
 });
 module.exports = router;
+
+//rota para pegar historias pelo id:
+
+router.get('/findhistory/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const history = await History.findById({ _id: id }).populate('authorid');
+        if (!history) {
+            return res.status(404).json({ message: 'Historia não encontrada!' });
+        }
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ message: 'Nenhum resultado foi encontrado!' });
+    }
+});
